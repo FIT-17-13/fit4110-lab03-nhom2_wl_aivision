@@ -1,0 +1,77 @@
+openapi: 3.1.0
+info:
+  title: Smart Campus — Camera Stream Service (Mock Partner)
+  version: 1.0.0
+  description: |
+    Bản hợp đồng giả lập của dịch vụ Camera Stream dùng để kiểm thử tích hợp.
+    Mở webhook nhận kết quả bóc tách từ AI Vision.
+servers:
+  - url: http://127.0.0.1:4012
+    description: Prism mock server cục bộ của Camera Stream
+paths:
+  /callbacks/alerts:
+    post:
+      operationId: receiveAiAlert
+      summary: Webhook nhận dữ liệu cảnh báo từ AI Vision
+      description: Endpoint để dịch vụ AI Vision đẩy kết quả phân tích (bounding box, mức độ rủi ro) ngược trở lại cho Camera Stream.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [detectionId, riskLevel, timestamp]
+              properties:
+                detectionId:
+                  type: string
+                  format: uuid
+                riskLevel:
+                  type: string
+                  enum: [LOW, MEDIUM, HIGH, 'null']
+                timestamp:
+                  type: string
+                  format: date-time
+            examples:
+              sampleAlert:
+                value:
+                  detectionId: 123e4567-e89b-12d3-a456-426614174000
+                  riskLevel: HIGH
+                  timestamp: "2026-05-19T08:00:02Z"
+      responses:
+        '201':
+          description: Đã ghi nhận cảnh báo thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+              examples:
+                successAck:
+                  value:
+                    status: "success"
+                    message: "Alert logged successfully in Camera Stream core."
+        '400':
+          description: Dữ liệu đẩy sang bị sai định dạng
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+
+components:
+  schemas:
+    Problem:
+      type: object
+      required: [type, title, status]
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string

@@ -1,6 +1,8 @@
-ID,Folder,Endpoint,Method,Scenario,Input file/body,Expected status,Expected response check,Type,Pass/Fail,Evidence
-TC01,Functional,/health,GET,Service is alive,-,200,status=ok,functional,,
-TC02,Functional,/readings,POST,Create reading happy path,mock-data/sensor-reading-valid.json,201,"has reading_id, accepted=true",functional,,
-TC03,Negative,/readings,POST,Missing device_id,mock-data/sensor-reading-invalid-missing-device.json,400,Problem Details,negative,,
-TC04,Auth,/readings,POST,Missing token,mock-data/sensor-reading-valid.json,401,Problem Details,auth,,
-TC05,Boundary,/readings,POST,High temperature boundary,mock-data/sensor-reading-boundary.json,201/400,documented behavior,boundary,,
+Test_ID,Category,API_Endpoint,Method,Test_Description,Input_Data,Expected_Status,Actual_Status,Result
+TC_01,01_Functional,/health,GET,Kiểm tra trạng thái service AI Vision trả về UP,Không có,200,200,Pass
+TC_02,01_Functional,/detect,POST,Kiểm tra gửi ảnh hợp lệ để phân tích bóc tách đối tượng,JSON hợp lệ chứa imageType URL,200,200,Pass
+TC_03,02_Auth,/models/info,GET,Kiểm tra truy cập API khi không truyền Token bảo mật,Không có Header Authorization,401,401,Pass
+TC_04,03_Negative,/detect,POST,Kiểm tra hệ thống bắt lỗi khi thiếu trường cameraId bắt buộc,JSON bị xóa trường cameraId,422,422,Pass
+TC_05,04_Boundary_Reliability,/detect,POST,Kiểm tra hệ thống bắt lỗi dữ liệu vượt biên (sai định dạng timestamp),JSON chứa timestamp sai định dạng date-time,422,422,Pass
+TC_06,05_Consumer_side_Smoke,/callbacks/alerts,POST,Kiểm tra gọi chéo gọi sang webhook của đối tác Camera Stream,JSON chứa detectionId và riskLevel,201,201,Pass
+TC_07,06_Local_only_NonFunctional,/health,GET,Kiểm tra độc lập trạng thái môi trường Local,Không có,200,200,Pass
